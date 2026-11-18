@@ -13,13 +13,12 @@ import {
   Mail,
   Moon,
   ShieldCheck,
-  ShieldPlus,
   Stethoscope,
   Sun,
   UserCheck,
 } from 'lucide-react';
 import { useHospital } from '../context/HospitalContext';
-import { ASSET_IMAGES, DEMO_ACCOUNTS } from '../services/dataService';
+import { DEMO_ACCOUNTS } from '../services/dataService';
 import { UserRole } from '../types/hospital';
 
 export const Login: React.FC = () => {
@@ -62,7 +61,7 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#F3F6FB] via-[#EAF1FA] to-[#E3F4F2] dark:from-[#0B1120] dark:via-[#0F172A] dark:to-[#0D1E2E] text-[#1E293B] dark:text-slate-100 flex flex-col">
+    <div className="login-screen min-h-screen relative overflow-hidden bg-gradient-to-br from-[#F3F6FB] via-[#EAF1FA] to-[#E3F4F2] dark:from-[#0B1120] dark:via-[#0F172A] dark:to-[#0D1E2E] text-[#1E293B] dark:text-slate-100 flex flex-col">
       {/* Subtle Ambient Background Geometry */}
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#2563EB]/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#16B8A6]/12 blur-3xl" />
@@ -97,8 +96,8 @@ export const Login: React.FC = () => {
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 rounded-2xl border border-white/70 dark:border-slate-800 bg-white/85 dark:bg-[#111827]/90 backdrop-blur-md shadow-xl overflow-hidden"
         >
-          {/* Left 3D Healthcare Showcase Panel */}
-          <div className="lg:col-span-6 relative bg-gradient-to-br from-[#142D4E] via-[#17355C] to-[#0F2340] text-white p-8 sm:p-10 flex flex-col justify-between gap-7 overflow-hidden">
+          {/* Abstract 2D healthcare showcase panel */}
+          <div className="login-showcase lg:col-span-6 relative bg-gradient-to-br from-[#102c40] via-[#174d56] to-[#143b4b] text-white p-8 sm:p-10 flex flex-col justify-between gap-7 overflow-hidden">
             <div>
               <p className="text-xs font-semibold text-[#16B8A6]">
                 Smart Hospital Administration Suite
@@ -111,31 +110,47 @@ export const Login: React.FC = () => {
               </p>
             </div>
 
-            {/* 3D Isometric Hospital Building with Floating Medical Nodes */}
-            <div className="relative perspective-1000 my-1">
-              <div className="relative overflow-hidden rounded-xl border border-white/15 bg-white/10 shadow-2xl">
-                <img
-                  src={ASSET_IMAGES.hero3dHospital}
-                  alt="3D smart hospital campus illustration"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-60 sm:h-72 object-cover"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#142D4E]/35 via-transparent to-transparent" />
+            <div className="login-abstract-visual relative my-1 flex h-60 sm:h-72 items-center justify-center overflow-hidden rounded-2xl border border-white/15">
+              <div className="absolute inset-0 opacity-60" aria-hidden="true">
+                <svg viewBox="0 0 720 360" className="h-full w-full" fill="none" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="careLine" x1="96" y1="176" x2="638" y2="176" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#77E4CA" stopOpacity=".12" />
+                      <stop offset=".48" stopColor="#A5F3E3" />
+                      <stop offset="1" stopColor="#84B9FF" stopOpacity=".22" />
+                    </linearGradient>
+                    <pattern id="careDots" width="22" height="22" patternUnits="userSpaceOnUse">
+                      <circle cx="1.2" cy="1.2" r="1" fill="white" fillOpacity=".18" />
+                    </pattern>
+                  </defs>
+                  <rect width="720" height="360" fill="url(#careDots)" />
+                  <path d="M-20 236C90 236 96 104 202 104S324 264 428 264 545 126 740 126" stroke="url(#careLine)" strokeWidth="2" />
+                  <path d="M-20 265C104 265 112 144 216 144S324 292 440 292 560 164 740 164" stroke="white" strokeOpacity=".12" />
+                  <circle cx="202" cy="104" r="8" fill="#9DE9D9" fillOpacity=".9" />
+                  <circle cx="428" cy="264" r="7" fill="#B8D8FF" fillOpacity=".9" />
+                  <circle cx="545" cy="126" r="5" fill="#9DE9D9" fillOpacity=".8" />
+                  <circle cx="202" cy="104" r="20" stroke="#9DE9D9" strokeOpacity=".32" />
+                  <circle cx="428" cy="264" r="18" stroke="#B8D8FF" strokeOpacity=".3" />
+                </svg>
               </div>
-
-              {/* Floating 3D Medical Icon Tiles */}
-              <div className="pointer-events-none absolute -top-3 -right-2 hidden sm:flex h-12 w-12 items-center justify-center rounded-xl border border-white/25 bg-[#142D4E]/85 backdrop-blur-md text-[#16B8A6] shadow-lg animate-float-slow">
-                <HeartPulse className="h-6 w-6" />
+              <div className="absolute -right-12 -top-16 h-52 w-52 rounded-full bg-[#71d8bd]/20 blur-3xl" />
+              <div className="absolute -bottom-16 -left-12 h-56 w-56 rounded-full bg-[#6e9cff]/20 blur-3xl" />
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-[28px] border border-white/25 bg-white/10 text-[#b6f2e5] shadow-[0_18px_45px_-20px_rgba(0,0,0,.7)] backdrop-blur-xl">
+                <HeartPulse className="h-11 w-11" strokeWidth={1.5} />
+                <span className="absolute -right-2 -top-2 h-4 w-4 rounded-full border-4 border-[#174d56] bg-[#a4efd7]" />
               </div>
-              <div className="pointer-events-none absolute -bottom-3 left-4 hidden sm:flex items-center gap-2 rounded-xl border border-white/25 bg-white/15 backdrop-blur-md px-3 py-2 text-xs font-semibold text-white shadow-lg animate-float-delayed">
-                <ShieldPlus className="h-4 w-4 text-[#16B8A6]" />
-                <span>Synced Clinical Modules</span>
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 rounded-xl border border-white/15 bg-[#102c42]/55 px-4 py-3 backdrop-blur-lg">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-[#a7ebd8]"><Activity className="h-4 w-4" /></span>
+                  <div><p className="text-xs font-semibold text-white">Connected care, clearly in view</p><p className="mt-0.5 text-[10px] text-white/60">One workspace across clinical operations</p></div>
+                </div>
+                <span className="hidden sm:inline-flex h-2 w-2 rounded-full bg-[#8de0c8] shadow-[0_0_14px_rgba(141,224,200,.8)]" />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4 border-t border-white/15 pt-5 text-xs">
               <div>
-                <div className="font-display text-lg font-bold text-white tabular-nums">12</div>
+                <div className="font-display text-lg font-bold text-white tabular-nums">22</div>
                 <div className="text-slate-300">Integrated Modules</div>
               </div>
               <div>
@@ -273,7 +288,7 @@ export const Login: React.FC = () => {
                       return (
                         <div
                           key={acc.id}
-                          className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#F3F6FB]/80 dark:bg-slate-800/60 p-3 flex flex-col justify-between gap-2 card-3d-hover"
+                          className="rounded-lg border border-slate-200 dark:border-slate-800 bg-[#F3F6FB]/80 dark:bg-slate-800/60 p-3 flex flex-col justify-between gap-2 surface-hover"
                         >
                           <div>
                             <div className="flex items-center gap-1.5 text-xs font-semibold text-[#142D4E] dark:text-white">

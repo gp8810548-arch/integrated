@@ -61,6 +61,14 @@ interface SearchHit {
   page: NavPage;
 }
 
+const NAVIGATION_HITS: SearchHit[] = Object.entries(PAGE_META).map(([page, meta]) => ({
+  id: page,
+  label: meta.title,
+  sublabel: meta.breadcrumb,
+  category: 'Navigate',
+  page: page as NavPage,
+}));
+
 export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const {
     activePage,
@@ -88,6 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [activeResultIndex, setActiveResultIndex] = useState(0);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,10 +109,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        const input = searchBoxRef.current?.querySelector('input');
+        input?.focus();
+        setSearchFocused(true);
+      }
+    };
+    document.addEventListener('keydown', handleShortcut);
+    return () => document.removeEventListener('keydown', handleShortcut);
+  }, []);
+
   const searchResults = useMemo<SearchHit[]>(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
-    const hits: SearchHit[] = [];
+    const hits: SearchHit[] = NAVIGATION_HITS.filter((hit) =>
+      allowedPages.includes(hit.page) && `${hit.label} ${hit.sublabel}`.toLowerCase().includes(q)
+    );
 
     if (allowedPages.includes('patients')) {
       patients
@@ -337,7 +361,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   };
 
   return (
-    <header className="no-print sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-sm px-4 sm:px-6">
+    <header className="medicare-topbar no-print sticky top-0 z-30 flex h-[82px] items-center justify-between gap-4 border-b border-slate-200/70 dark:border-slate-800 bg-white/92 dark:bg-[#11232e]/94 backdrop-blur-xl px-4 sm:px-6 xl:px-8">
       {/* Left: Mobile Drawer Trigger + Context */}
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -349,8 +373,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           <Menu className="h-5 w-5" />
         </button>
         <div className="min-w-0">
-          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{meta.breadcrumb}</p>
-          <h1 className="font-display text-base sm:text-lg font-bold text-[#142D4E] dark:text-white truncate">
+          <p className="text-[10px] font-bold uppercase tracking-[.12em] text-[#168a79] truncate">{meta.breadcrumb}</p>
+          <h1 className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#18363a] dark:text-white truncate">
             {meta.title}
           </h1>
         </div>
@@ -366,12 +390,36 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
             onFocus={() => setSearchFocused(true)}
             onChange={(e) => {
               setSearchQuery(e.target.value);
+              setActiveResultIndex(0);
               setSearchFocused(true);
             }}
             placeholder="Search patients, doctors, invoices, medicines..."
-            aria-label="Global hospital search"
-            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-[#F4F7FB] dark:bg-slate-800/80 py-2 pl-9 pr-8 text-sm text-[#263449] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#2563EB] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+            aria-label="Global hospital search and navigation"
+            aria-controls="global-search-results"
+            aria-expanded={searchFocused}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowDown' && searchResults.length) {
+                event.preventDefault();
+                setActiveResultIndex((current) => (current + 1) % searchResults.length);
+              }
+              if (event.key === 'ArrowUp' && searchResults.length) {
+                event.preventDefault();
+                setActiveResultIndex((current) => (current - 1 + searchResults.length) % searchResults.length);
+              }
+              if (event.key === 'Enter' && searchResults[activeResultIndex]) {
+                const hit = searchResults[activeResultIndex];
+                setActivePage(hit.page);
+                setSearchFocused(false);
+                setSearchQuery('');
+              }
+              if (event.key === 'Escape') {
+                setSearchFocused(false);
+                event.currentTarget.blur();
+              }
+            }}
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-[#F4F7FB] dark:bg-slate-800/80 py-2 pl-9 pr-11 text-sm text-[#263449] dark:text-slate-100 placeholder:text-slate-400 focus:border-[#2563EB] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
           />
+          {!searchQuery && <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-slate-200 dark:border-slate-600 bg-white/70 dark:bg-slate-700 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">Ctrl K</kbd>}
           {searchQuery && (
             <button
               type="button"
@@ -401,6 +449,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -4, scale: 0.98 }}
               transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+              id="global-search-results"
+              role="listbox"
+              aria-label="Search results"
               className="absolute left-0 right-0 mt-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-lg overflow-hidden z-50"
             >
               {searchResults.length === 0 ? (
@@ -409,16 +460,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
                 </div>
               ) : (
                 <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {searchResults.map((hit) => (
+                  {searchResults.map((hit, index) => (
                     <li key={`${hit.category}-${hit.id}`}>
                       <button
                         type="button"
+                        role="option"
+                        aria-selected={index === activeResultIndex}
                         onClick={() => {
                           setActivePage(hit.page);
                           setSearchFocused(false);
                           setSearchQuery('');
                         }}
-                        className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors"
+                        className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors ${index === activeResultIndex ? 'bg-slate-50 dark:bg-slate-800/70' : 'hover:bg-slate-50 dark:hover:bg-slate-800/70'}`}
                       >
                         <span className="flex items-center gap-3 min-w-0">
                           {getHitIcon(hit.category)}

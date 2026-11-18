@@ -30,8 +30,8 @@ export const PatientRegistrationChart: React.FC<{
         <AreaChart data={data} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
           <defs>
             <linearGradient id="patientAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2563EB" stopOpacity={0.28} />
-              <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
+              <stop offset="5%" stopColor="#7587ef" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#7587ef" stopOpacity={0.0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
@@ -49,11 +49,12 @@ export const PatientRegistrationChart: React.FC<{
             type="monotone"
             dataKey="registrations"
             name="Registrations"
-            stroke="#2563EB"
+            stroke="#647be5"
             strokeWidth={2.5}
             fillOpacity={1}
             fill="url(#patientAreaGrad)"
-            animationDuration={700}
+            animationDuration={850}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -85,8 +86,8 @@ export const RevenueAnalyticsChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="collected" name="Collected ($)" fill="#16B8A6" radius={[4, 4, 0, 0]} animationDuration={700} />
-          <Bar dataKey="pending" name="Pending ($)" fill="#142D4E" radius={[4, 4, 0, 0]} animationDuration={700} />
+          <Bar dataKey="collected" name="Collected ($)" fill="#28aa97" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
+          <Bar dataKey="pending" name="Pending ($)" fill="#7181df" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -112,7 +113,8 @@ export const AppointmentStatusChart: React.FC<{
             outerRadius={78}
             paddingAngle={3}
             dataKey="value"
-            animationDuration={700}
+            animationDuration={850}
+            animationEasing="ease-out"
           >
             {data.map((entry) => (
               <Cell key={entry.name} fill={entry.color} />
@@ -164,7 +166,7 @@ export const DepartmentBarChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="count" name="Appointments" fill="#2563EB" radius={[0, 4, 4, 0]} animationDuration={700} />
+          <Bar dataKey="count" name="Appointments" fill="#687fe4" radius={[0, 5, 5, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -195,9 +197,9 @@ export const BedOccupancyChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="available" name="Available" stackId="beds" fill="#16A34A" radius={[0, 0, 0, 0]} animationDuration={700} />
-          <Bar dataKey="occupied" name="Occupied" stackId="beds" fill="#EF4444" radius={[0, 0, 0, 0]} animationDuration={700} />
-          <Bar dataKey="reserved" name="Reserved" stackId="beds" fill="#F59E0B" radius={[4, 4, 0, 0]} animationDuration={700} />
+          <Bar dataKey="available" name="Available" stackId="beds" fill="#38aa83" radius={[0, 0, 0, 0]} animationDuration={850} animationEasing="ease-out" />
+          <Bar dataKey="occupied" name="Occupied" stackId="beds" fill="#dc7184" radius={[0, 0, 0, 0]} animationDuration={850} animationEasing="ease-out" />
+          <Bar dataKey="reserved" name="Reserved" stackId="beds" fill="#e4ac52" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -228,8 +230,8 @@ export const DoctorWorkloadChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="appointments" name="Appointments" fill="#2563EB" radius={[4, 4, 0, 0]} animationDuration={700} />
-          <Bar dataKey="activeLoad" name="Active Queue / ER" fill="#16B8A6" radius={[4, 4, 0, 0]} animationDuration={700} />
+          <Bar dataKey="appointments" name="Appointments" fill="#687fe4" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
+          <Bar dataKey="activeLoad" name="Active Queue / ER" fill="#35ac98" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -266,7 +268,7 @@ export const EmergencyStatsChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="count" name="Cases" radius={[4, 4, 0, 0]} animationDuration={700}>
+          <Bar dataKey="count" name="Cases" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out">
             {data.map((entry) => (
               <Cell key={entry.priority} fill={palette[entry.priority] ?? '#2563EB'} />
             ))}
@@ -301,8 +303,8 @@ export const PharmacyInventoryChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="stock" name="Available Stock" fill="#2563EB" radius={[4, 4, 0, 0]} animationDuration={700} />
-          <Bar dataKey="reorderLevel" name="Reorder Threshold" fill="#F59E0B" radius={[4, 4, 0, 0]} animationDuration={700} />
+          <Bar dataKey="stock" name="Available Stock" fill="#687fe4" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
+          <Bar dataKey="reorderLevel" name="Reorder Threshold" fill="#e4ac52" radius={[5, 5, 0, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -341,7 +343,7 @@ export const PatientSatisfactionChart: React.FC<{
               fontSize: '12px',
             }}
           />
-          <Bar dataKey="avgRating" name="Avg Rating (/5)" fill="#16B8A6" radius={[0, 4, 4, 0]} animationDuration={700} />
+          <Bar dataKey="avgRating" name="Avg Rating (/5)" fill="#35ac98" radius={[0, 5, 5, 0]} animationDuration={850} animationEasing="ease-out" />
         </BarChart>
       </ResponsiveContainer>
     </div>

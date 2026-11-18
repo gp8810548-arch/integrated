@@ -131,19 +131,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
     const isCollapsed = sidebarCollapsed && !isMobile;
 
     return (
-      <div className="flex h-full flex-col bg-gradient-to-b from-[#142D4E] to-[#0E2038] text-slate-100 select-none">
+      <div className="medicare-sidebar flex h-full flex-col bg-white text-slate-700 select-none">
         {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
+        <div className="flex h-[76px] items-center justify-between border-b border-slate-100 px-4">
           <button
             type="button"
             onClick={() => handleSelect('dashboard')}
-            className="flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#16B8A6] rounded-lg"
+            className="flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#168A79] rounded-lg"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#16B8A6] text-white shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#1c9c89] to-[#14796e] text-white shadow-[0_8px_20px_-9px_rgba(22,138,121,.75)]">
               <Activity className="h-5 w-5" />
             </div>
             {!isCollapsed && (
-              <span className="font-display text-base font-bold tracking-tight text-white whitespace-nowrap">
+              <span className="font-display text-[15px] font-bold tracking-tight text-[#18363a] whitespace-nowrap">
                 MediCare Pro
               </span>
             )}
@@ -154,7 +154,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
               type="button"
               onClick={onCloseMobile}
               aria-label="Close navigation menu"
-              className="rounded-lg p-1.5 text-slate-300 hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-800"
             >
               <X className="h-5 w-5" />
             </button>
@@ -163,7 +163,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
               type="button"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              className="hidden lg:flex h-7 w-7 items-center justify-center rounded-md text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+              className="hidden lg:flex h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
             >
               {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
@@ -178,10 +178,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
             return (
               <div
                 key={section.heading}
-                className={idx > 0 ? 'border-t border-white/8 pt-4' : ''}
+                className={idx > 0 ? 'border-t border-slate-100 pt-4' : ''}
               >
                 {!isCollapsed && (
-                  <div className="mb-1.5 px-3 text-[11px] font-semibold tracking-wider text-slate-400">
+                  <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">
                     {section.heading}
                   </div>
                 )}
@@ -195,29 +195,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
                           type="button"
                           onClick={() => handleSelect(item.id)}
                           aria-label={item.label}
+                          aria-current={isActive ? 'page' : undefined}
                           className={`relative flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
                             isActive
-                              ? 'text-white'
-                              : 'text-slate-300 hover:bg-white/8 hover:text-white'
+                              ? 'text-[#14796e]'
+                              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
                           }`}
                         >
                           {isActive && (
                             <motion.span
                               layoutId={isMobile ? 'sidebarActiveMobile' : 'sidebarActiveDesktop'}
                               transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                              className="absolute inset-0 rounded-lg bg-[#2563EB] shadow-sm"
+                              className="absolute inset-y-0 left-0 right-0 rounded-xl bg-[#eaf5f2] ring-1 ring-inset ring-[#d9eee8] shadow-[inset_3px_0_0_#168a79]"
                             />
                           )}
                           <span className="relative z-10 flex items-center gap-3 min-w-0">
                             <Icon
                               className={`h-4 w-4 shrink-0 transition-transform duration-150 group-hover/nav:scale-110 ${
-                                isActive ? 'text-white' : 'text-slate-400 group-hover/nav:text-white'
+                                isActive ? 'text-[#168a79]' : 'text-slate-400 group-hover/nav:text-slate-700'
                               }`}
                             />
                             {!isCollapsed && <span className="truncate">{item.label}</span>}
                           </span>
                           {!isCollapsed && typeof item.badge === 'number' && item.badge > 0 && (
-                            <span className="relative z-10 font-mono-num text-xs font-semibold text-[#16B8A6] bg-white/10 px-1.5 py-0.5 rounded">
+                            <span className="relative z-10 font-mono-num text-[11px] font-semibold text-[#14796e] bg-white/75 px-1.5 py-0.5 rounded-md">
                               {item.badge}
                             </span>
                           )}
@@ -227,7 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
                         {isCollapsed && (
                           <div
                             role="tooltip"
-                            className="pointer-events-none fixed left-[78px] z-50 hidden group-hover/nav:flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white shadow-lg whitespace-nowrap"
+                            className="pointer-events-none fixed left-[78px] z-50 hidden group-hover/nav:flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-lg whitespace-nowrap"
                           >
                             <span>{item.label}</span>
                             {typeof item.badge === 'number' && item.badge > 0 && (
@@ -245,10 +246,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
         </nav>
 
         {/* Account & Logout Footer */}
-        <div className="border-t border-white/10 p-3 space-y-2">
+        <div className="border-t border-slate-100 p-3 space-y-2">
           {!isCollapsed && session && (
-            <div className="px-3 py-1.5 text-xs text-slate-300">
-              <div className="font-semibold text-white truncate">{session.name}</div>
+            <div className="px-3 py-1.5 text-xs text-slate-500">
+              <div className="font-semibold text-slate-800 truncate">{session.name}</div>
               <div className="text-slate-400 truncate">
                 {session.role} · {session.department}
               </div>
@@ -258,7 +259,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
             type="button"
             onClick={logout}
             title={isCollapsed ? 'Logout' : undefined}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-red-500/15 hover:text-red-200 transition-colors whitespace-nowrap"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 hover:bg-rose-50 hover:text-rose-700 transition-colors whitespace-nowrap"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             {!isCollapsed && <span>Logout</span>}
@@ -272,8 +273,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onCloseMobile }) =
     <>
       {/* Desktop Sidebar */}
       <aside
-        className={`no-print hidden lg:block shrink-0 transition-[width] duration-200 border-r border-slate-200 dark:border-slate-800 ${
-          sidebarCollapsed ? 'w-[72px]' : 'w-[256px]'
+        className={`no-print hidden lg:block shrink-0 transition-[width] duration-200 border-r border-slate-200/80 dark:border-slate-800 ${
+          sidebarCollapsed ? 'w-[76px]' : 'w-[264px]'
         }`}
       >
         <div className="sticky top-0 h-screen">{renderSidebarContent(false)}</div>

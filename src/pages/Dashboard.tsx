@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ArrowRight,
   BedDouble,
@@ -21,7 +21,6 @@ import {
   RevenueAnalyticsChart,
 } from '../components/Charts';
 import {
-  ASSET_IMAGES,
   computeBedOccupancyByWard,
   computeDepartmentStats,
   computeMonthlyRegistrations,
@@ -31,6 +30,8 @@ import {
 } from '../services/dataService';
 
 export const Dashboard: React.FC = () => {
+  const [activityFilter, setActivityFilter] = useState<'All' | 'Patient care' | 'Operations' | 'System'>('All');
+  const [notificationFilter, setNotificationFilter] = useState<'Priority' | 'Unread' | 'All'>('Priority');
   const {
     session,
     patients,
@@ -89,6 +90,29 @@ export const Dashboard: React.FC = () => {
     [patients]
   );
 
+  const visibleActivities = useMemo(() => {
+    const patterns: Record<Exclude<typeof activityFilter, 'All'>, RegExp> = {
+      'Patient care': /patient|appointment|emergency|queue|laboratory|clinical|emr/i,
+      Operations: /billing|pharmacy|bed|blood|insurance|ambulance|staff|discharge/i,
+      System: /system|setting|audit|report|notification/i,
+    };
+    return activities
+      .filter((activity) => activityFilter === 'All' || patterns[activityFilter].test(`${activity.module} ${activity.message}`))
+      .slice(0, 6);
+  }, [activities, activityFilter]);
+
+  const visibleNotifications = useMemo(() => {
+    const severityRank = { critical: 0, warning: 1, info: 2, success: 3 } as const;
+    return notifications
+      .filter((notification) => {
+        if (notificationFilter === 'Unread') return !notification.read;
+        if (notificationFilter === 'Priority') return notification.severity === 'critical' || notification.severity === 'warning';
+        return true;
+      })
+      .sort((a, b) => Number(a.read) - Number(b.read) || severityRank[a.severity] - severityRank[b.severity])
+      .slice(0, 5);
+  }, [notifications, notificationFilter]);
+
   const upcomingAppointments = useMemo(
     () =>
       appointments
@@ -102,26 +126,32 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Premium 3D Welcome Hero Banner */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#142D4E] via-[#1B3A63] to-[#133554] text-white p-6 sm:p-7 border border-slate-200/10 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="flex items-center gap-2 text-xs font-medium text-[#16B8A6]">
-              <HeartPulse className="h-4 w-4" />
-              <span>{settings.hospitalName} · {today}</span>
+      {/* Daily operations overview */}
+      <section className="dashboard-welcome relative isolate overflow-hidden rounded-[26px] border border-[#d8e9e4] bg-white shadow-[0_18px_50px_-36px_rgba(17,67,61,.32)]">
+        <div className="pointer-events-none absolute -right-24 -top-32 -z-10 h-80 w-80 rounded-full bg-[#e8f5f0] blur-2xl" />
+        <div className="grid lg:grid-cols-[1.15fr_.85fr]">
+          <div className="space-y-5 p-6 sm:p-8 xl:p-9">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#d8ece5] bg-[#f0f8f5] px-3 py-1.5 text-[11px] font-bold tracking-wide text-[#14796e]">
+                <HeartPulse className="h-3.5 w-3.5" />
+                {settings.hospitalName}
+              </span>
+              <span className="rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-medium text-slate-500">{today}</span>
             </div>
-            <h2 className="font-display text-xl sm:text-2xl font-bold text-white leading-snug [text-wrap:balance]">
-              Welcome back, {session?.name ?? 'Administrator'}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              You have <span className="font-semibold text-white tabular-nums">{stats.todaysAppointments}</span> scheduled appointments today, <span className="font-semibold text-[#16B8A6] tabular-nums">{stats.availableBeds}</span> available hospital beds across {wards.length} wards, and <span className="font-semibold text-white tabular-nums">{unreadNotificationCount}</span> active operational alerts.
-            </p>
+            <div className="space-y-2">
+              <h2 className="font-display text-2xl sm:text-3xl xl:text-[34px] font-bold tracking-tight text-[#18363a] leading-tight [text-wrap:balance]">
+                Welcome back, {session?.name ?? 'Administrator'}
+              </h2>
+              <p className="max-w-2xl text-sm leading-6 text-[#718488]">
+                Your hospital at a glance. There are <span className="font-semibold text-[#294449] tabular-nums">{stats.todaysAppointments} appointments</span> today, <span className="font-semibold text-[#14796e] tabular-nums">{stats.availableBeds} beds ready</span> across {wards.length} wards, and <span className="font-semibold text-[#294449] tabular-nums">{unreadNotificationCount} alerts</span> to review.
+              </p>
+            </div>
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               {canOpen('patients') && (
                 <button
                   type="button"
                   onClick={() => setActivePage('patients')}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563EB] px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-600 active:scale-[0.98] transition-all whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#14796e] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_8px_18px_-10px_rgba(20,121,110,.9)] hover:bg-[#106b62] active:scale-[0.98] transition-all whitespace-nowrap"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Register Patient</span>
@@ -131,9 +161,9 @@ export const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActivePage('appointments')}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/15 active:scale-[0.98] transition-all whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#dfe9e6] bg-white px-4 py-2.5 text-xs font-semibold text-[#294449] hover:bg-[#f6faf8] active:scale-[0.98] transition-all whitespace-nowrap"
                 >
-                  <CalendarClock className="h-3.5 w-3.5 text-[#16B8A6]" />
+                  <CalendarClock className="h-3.5 w-3.5 text-[#168a79]" />
                   <span>Book Appointment</span>
                 </button>
               )}
@@ -141,24 +171,42 @@ export const Dashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setActivePage('beds')}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm px-3.5 py-2 text-xs font-semibold text-white hover:bg-white/15 active:scale-[0.98] transition-all whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#dfe9e6] bg-white px-4 py-2.5 text-xs font-semibold text-[#294449] hover:bg-[#f6faf8] active:scale-[0.98] transition-all whitespace-nowrap"
                 >
-                  <BedDouble className="h-3.5 w-3.5 text-[#16B8A6]" />
+                  <BedDouble className="h-3.5 w-3.5 text-[#168a79]" />
                   <span>Ward Occupancy</span>
                 </button>
               )}
             </div>
           </div>
 
-          {/* 3D Glass Shield & Telemetry Visual */}
-          <div className="relative hidden sm:flex items-center justify-center shrink-0 perspective-1000">
-            <div className="relative h-36 w-36 lg:h-40 lg:w-40 rounded-2xl overflow-hidden border border-white/20 shadow-2xl animate-float-slow">
-              <img
-                src={ASSET_IMAGES.dashboard3dGraphic}
-                alt="3D Healthcare Telemetry Shield"
-                referrerPolicy="no-referrer"
-                className="h-full w-full object-cover"
-              />
+          <div className="dashboard-welcome-art relative m-3 mt-0 flex min-h-[210px] flex-col justify-between overflow-hidden rounded-[21px] bg-[#153f3d] p-5 text-white sm:m-4 sm:mt-4 lg:ml-0 lg:min-h-0">
+            <div className="absolute -right-9 -top-16 h-48 w-48 rounded-full border border-white/10" />
+            <div className="absolute -right-1 -top-8 h-32 w-32 rounded-full border border-white/10" />
+            <div className="relative z-10 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#9bd8c9]">Today at a glance</p>
+                <p className="mt-1 text-sm font-semibold text-white">Care teams are ready</p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-[#d6f0e8]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#62d4a7]" /> Live workspace
+              </span>
+            </div>
+            <div className="relative z-10 grid grid-cols-2 gap-3 pt-5">
+              <div className="rounded-2xl border border-white/10 bg-white/[.08] p-3.5 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-[#b8e4d8]"><CalendarClock className="h-4 w-4" /><span className="text-[10px] font-semibold uppercase tracking-wide">Appointments</span></div>
+                <div className="mt-2 font-display text-2xl font-bold tabular-nums">{stats.todaysAppointments}</div>
+                <div className="mt-0.5 text-[10px] text-white/60">Scheduled for today</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[.08] p-3.5 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-[#b8e4d8]"><BedDouble className="h-4 w-4" /><span className="text-[10px] font-semibold uppercase tracking-wide">Beds available</span></div>
+                <div className="mt-2 font-display text-2xl font-bold tabular-nums">{stats.availableBeds}<span className="ml-1 text-sm font-medium text-white/55">/ {stats.totalBeds}</span></div>
+                <div className="mt-0.5 text-[10px] text-white/60">Across {wards.length} wards</div>
+              </div>
+            </div>
+            <div className="relative z-10 mt-3 flex items-center justify-between border-t border-white/10 pt-3 text-[10px] text-white/65">
+              <span>{stats.totalPatients} registered patients</span>
+              <span>{doctors.filter((d) => d.availability === 'Available').length} clinicians available</span>
             </div>
           </div>
         </div>
@@ -449,23 +497,42 @@ export const Dashboard: React.FC = () => {
       {/* Bottom Row: Notification Centre & Recent Patient Activity */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-          <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
               <Bell className="h-4 w-4 text-[#2563EB]" />
               <h2 className="font-display text-base font-bold text-[#142D4E] dark:text-white">
                 Notification Centre
               </h2>
             </div>
-            <button
-              type="button"
-              onClick={() => setActivePage('notifications')}
-              className="text-xs font-medium text-[#2563EB] hover:underline whitespace-nowrap"
-            >
-              View All ({unreadNotificationCount} unread)
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1 rounded-xl bg-slate-50 p-1 dark:bg-slate-800" role="group" aria-label="Filter notifications">
+                {(['Priority', 'Unread', 'All'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    aria-pressed={notificationFilter === filter}
+                    onClick={() => setNotificationFilter(filter)}
+                    className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${notificationFilter === filter ? 'bg-white text-[#14796e] shadow-sm dark:bg-slate-700 dark:text-emerald-300' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivePage('notifications')}
+                className="text-xs font-medium text-[#2563EB] hover:underline whitespace-nowrap"
+              >
+                All ({unreadNotificationCount})
+              </button>
+            </div>
           </div>
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {notifications.slice(0, 5).map((n) => (
+          <div className="divide-y divide-slate-100 dark:divide-slate-800" aria-live="polite">
+            {visibleNotifications.length === 0 ? (
+              <p className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                {notificationFilter === 'Priority' ? 'No critical or warning alerts right now.' : 'No notifications in this view.'}
+              </p>
+            ) : visibleNotifications.map((n) => (
               <div key={n.id} className="py-3 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-xs">
@@ -491,9 +558,20 @@ export const Dashboard: React.FC = () => {
                       </>
                     )}
                   </div>
-                  <p className="mt-1 text-sm font-medium text-[#1E293B] dark:text-slate-100">
-                    {n.title}
-                  </p>
+                  {canOpen(n.targetPage) ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        markNotificationRead(n.id);
+                        setActivePage(n.targetPage);
+                      }}
+                      className="mt-1 block text-left text-sm font-medium text-[#1E293B] hover:text-[#14796e] dark:text-slate-100 dark:hover:text-emerald-300"
+                    >
+                      {n.title}
+                    </button>
+                  ) : (
+                    <p className="mt-1 text-sm font-medium text-[#1E293B] dark:text-slate-100">{n.title}</p>
+                  )}
                   <p className="text-xs text-[#64748B] dark:text-slate-400">{n.message}</p>
                 </div>
                 {!n.read && (
@@ -511,24 +589,41 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="lg:col-span-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
-          <div className="mb-3">
-            <h2 className="font-display text-base font-bold text-[#142D4E] dark:text-white">
-              Recent Patient & Clinical Activity
-            </h2>
-            <p className="text-xs text-[#64748B] dark:text-slate-400">
-              Live audit feed across all MediCare Pro modules
-            </p>
+          <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-bold text-[#142D4E] dark:text-white">
+                Recent Patient & Clinical Activity
+              </h2>
+              <p className="text-xs text-[#64748B] dark:text-slate-400">
+                Live audit feed across all MediCare Pro modules
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1 rounded-xl bg-slate-50 p-1 dark:bg-slate-800" role="group" aria-label="Filter activity timeline">
+              {(['All', 'Patient care', 'Operations', 'System'] as const).map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  aria-pressed={activityFilter === filter}
+                  onClick={() => setActivityFilter(filter)}
+                  className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors ${activityFilter === filter ? 'bg-white text-[#14796e] shadow-sm dark:bg-slate-700 dark:text-emerald-300' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {activities.slice(0, 6).map((act) => (
-              <div key={act.id} className="py-3 flex items-start justify-between gap-3">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800" aria-live="polite">
+            {visibleActivities.length === 0 ? (
+              <p className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">No activity in this category yet.</p>
+            ) : visibleActivities.map((act) => (
+              <div key={act.id} className="relative py-3 pl-5 flex items-start justify-between gap-3 before:absolute before:left-1 before:top-5 before:h-2 before:w-2 before:rounded-full before:bg-[#54aa97] before:ring-4 before:ring-[#eaf5f2] dark:before:ring-[#183b3a]">
                 <div className="min-w-0">
                   <p className="text-sm text-[#1E293B] dark:text-slate-100">{act.message}</p>
                   <p className="mt-0.5 text-xs text-[#64748B] dark:text-slate-400">
                     {act.actor} · {act.module}
                   </p>
                 </div>
-                <span className="font-mono-num text-xs text-slate-400 shrink-0">
+                <span className="font-mono-num text-xs text-slate-400 shrink-0" title={act.timestamp}>
                   {act.timestamp}
                 </span>
               </div>

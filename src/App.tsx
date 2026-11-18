@@ -95,12 +95,12 @@ const AppWorkspace: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#F3F6FB] dark:bg-[#0B1120] text-[#1E293B] dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex bg-transparent text-[#18363a] dark:text-slate-100 transition-colors duration-200">
       <Sidebar mobileOpen={mobileMenuOpen} onCloseMobile={() => setMobileMenuOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0">
         <Navbar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
-        <main className="print-app-shell flex-1 p-4 sm:p-6 max-w-[1600px] w-full mx-auto">
+        <main className="print-app-shell flex-1 p-4 sm:p-6 xl:p-8 max-w-[1800px] w-full mx-auto">
           <AnimatePresence mode="wait">
             <PageTransition pageKey={activePage}>{renderPage()}</PageTransition>
           </AnimatePresence>

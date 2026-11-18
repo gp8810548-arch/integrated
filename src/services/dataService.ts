@@ -35,8 +35,6 @@ import {
 
 export const ASSET_IMAGES = {
   loginIllustration: '/src/assets/images/login_hospital_illustration_1794986121973.jpg',
-  hero3dHospital: '/src/assets/images/hero_3d_medical_hub_1794987450805.jpg',
-  dashboard3dGraphic: '/src/assets/images/dashboard_3d_healthcare_1794987451339.jpg',
   doctorMale: '/src/assets/images/doctor_avatar_male_1794986123516.jpg',
   doctorFemale: '/src/assets/images/doctor_avatar_female_1794986122203.jpg',
   campusBanner: '/src/assets/images/hospital_campus_banner_1794986122911.jpg',

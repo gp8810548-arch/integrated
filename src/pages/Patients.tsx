@@ -504,7 +504,7 @@ export const Patients: React.FC = () => {
               <article
                 key={p.id}
                 onClick={() => setProfilePatientId(p.id)}
-                className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 card-3d-hover flex flex-col justify-between gap-4"
+                className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 surface-hover flex flex-col justify-between gap-4"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">

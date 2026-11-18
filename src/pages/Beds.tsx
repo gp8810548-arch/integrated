@@ -264,13 +264,13 @@ export const Beds: React.FC = () => {
                   No beds in this ward match the selected status filter.
                 </p>
               ) : (
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 perspective-1000">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                   {wardBeds.map((bed) => {
                     const style = getBedCardTheme(bed.status);
                     return (
                       <div
                         key={bed.id}
-                        className={`rounded-lg border ${style.border} bg-[#F3F6FB]/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between gap-3 card-3d-hover`}
+                        className={`rounded-lg border ${style.border} bg-[#F3F6FB]/70 dark:bg-slate-800/40 p-3.5 flex flex-col justify-between gap-3 surface-hover`}
                       >
                         <div>
                           <div className="flex items-center justify-between gap-2">

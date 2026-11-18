@@ -203,7 +203,7 @@ export const Doctors: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 perspective-1000">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredDoctors.map((doc) => {
             const activeCount = appointments.filter(
               (a) => a.doctorId === doc.id && a.status !== 'Cancelled'
@@ -213,7 +213,7 @@ export const Doctors: React.FC = () => {
               <article
                 key={doc.id}
                 onClick={() => setProfileDoctor(doc)}
-                className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex flex-col justify-between gap-4 card-3d-hover hover:border-[#2563EB]/40"
+                className="cursor-pointer rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex flex-col justify-between gap-4 surface-hover hover:border-[#2563EB]/40"
               >
                 <div>
                   {/* Header */}
